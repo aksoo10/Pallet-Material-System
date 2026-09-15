@@ -28,12 +28,23 @@ putenv('APP_PACKAGES_CACHE=/tmp/bootstrap/cache/packages.php');
 putenv('APP_ROUTES_CACHE=/tmp/bootstrap/cache/routes.php');
 putenv('APP_SERVICES_CACHE=/tmp/bootstrap/cache/services.php');
 
-// Ensure timezone is valid
-$timezone = getenv('APP_TIMEZONE') ?: ($_ENV['APP_TIMEZONE'] ?? null);
-if (empty($timezone) || ! @timezone_open((string) $timezone)) {
-    putenv('APP_TIMEZONE=Asia/Jakarta');
-    $_ENV['APP_TIMEZONE'] = 'Asia/Jakarta';
-    $_SERVER['APP_TIMEZONE'] = 'Asia/Jakarta';
+// Ensure critical environment variables are not empty strings
+$defaultEnvs = [
+    'SESSION_DRIVER' => 'cookie',
+    'CACHE_STORE' => 'array',
+    'APP_TIMEZONE' => 'Asia/Jakarta',
+    'APP_ENV' => 'production',
+    'APP_MAINTENANCE_DRIVER' => 'file',
+    'APP_KEY' => 'base64:lvX3kwemEw1kb+Sa2RHzlxOEgyo5LEP/wod7WKwgZR0=',
+];
+
+foreach ($defaultEnvs as $key => $defaultVal) {
+    $val = getenv($key) ?: ($_ENV[$key] ?? ($_SERVER[$key] ?? null));
+    if ($val === false || trim((string) $val) === '') {
+        putenv("{$key}={$defaultVal}");
+        $_ENV[$key] = $defaultVal;
+        $_SERVER[$key] = $defaultVal;
+    }
 }
 
 // Delegate execution to Laravel's public/index.php with fallback error capture
