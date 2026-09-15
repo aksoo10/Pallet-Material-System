@@ -32,7 +32,8 @@
   ],
   "env": {
     "APP_ENV": "production",
-    "APP_DEBUG": "false",
+    "APP_DEBUG": "true",
+    "VERCEL": "1",
     "APP_TIMEZONE": "Asia/Jakarta",
     "APP_CONFIG_CACHE": "/tmp/config.php",
     "APP_EVENTS_CACHE": "/tmp/events.php",
@@ -42,6 +43,6 @@
     "VIEW_COMPILED_PATH": "/tmp/storage/framework/views",
     "CACHE_STORE": "array",
     "LOG_CHANNEL": "stderr",
-    "SESSION_DRIVER": "database"
+    "SESSION_DRIVER": "cookie"
   }
 }

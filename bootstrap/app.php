@@ -21,7 +21,7 @@ $app = Application::configure(basePath: dirname(__DIR__))
     })->create();
 
 // Automatically redirect storage directory to writable /tmp when running in Vercel serverless environment
-if (isset($_ENV['VERCEL']) || env('VERCEL') || isset($_SERVER['VERCEL'])) {
+if (isset($_ENV['VERCEL']) || env('VERCEL') || isset($_SERVER['VERCEL']) || is_dir('/tmp/storage')) {
     $app->useStoragePath('/tmp/storage');
 }
 
