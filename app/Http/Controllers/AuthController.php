@@ -7,6 +7,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
 
 class AuthController extends Controller
@@ -48,39 +49,49 @@ class AuthController extends Controller
 
         $normalizedInput = $normalize($userId);
 
-        // 1. Primary lookup: Exact user_id or name (case-insensitive & whitespace/underscore tolerant)
-        $user = User::where('user_id', $userId)
-            ->orWhere('name', $userId)
-            ->orWhereRaw('LOWER(user_id) = ?', [strtolower($userId)])
-            ->orWhereRaw('LOWER(name) = ?', [strtolower($userId)])
-            ->orWhereRaw('REPLACE(REPLACE(LOWER(user_id), "_", " "), "-", " ") = ?', [str_replace(['_', '-'], ' ', strtolower($userId))])
-            ->orWhereRaw('REPLACE(REPLACE(LOWER(name), "_", " "), "-", " ") = ?', [str_replace(['_', '-'], ' ', strtolower($userId))])
-            ->first();
+        try {
+            // 1. Primary lookup: Exact user_id or name (case-insensitive & whitespace/underscore tolerant)
+            $user = User::where('user_id', $userId)
+                ->orWhere('name', $userId)
+                ->orWhereRaw('LOWER(user_id) = ?', [strtolower($userId)])
+                ->orWhereRaw('LOWER(name) = ?', [strtolower($userId)])
+                ->orWhereRaw('REPLACE(REPLACE(LOWER(user_id), "_", " "), "-", " ") = ?', [str_replace(['_', '-'], ' ', strtolower($userId))])
+                ->orWhereRaw('REPLACE(REPLACE(LOWER(name), "_", " "), "-", " ") = ?', [str_replace(['_', '-'], ' ', strtolower($userId))])
+                ->first();
 
-        // 2. Secondary lookup: Normalized comparison across all existing users
-        if (! $user) {
-            $allUsers = User::all();
-            foreach ($allUsers as $u) {
-                if ($normalize($u->user_id) === $normalizedInput || $normalize($u->name) === $normalizedInput) {
-                    $user = $u;
-                    break;
+            // 2. Secondary lookup: Normalized comparison across all existing users
+            if (! $user) {
+                $allUsers = User::all();
+                foreach ($allUsers as $u) {
+                    if ($normalize($u->user_id) === $normalizedInput || $normalize($u->name) === $normalizedInput) {
+                        $user = $u;
+                        break;
+                    }
                 }
             }
-        }
 
-        // 3. Fallback auto-provisioning for production/server if the user account does not exist in DB yet
-        if (! $user && (str_contains($normalizedInput, 'andritztk') || str_contains($normalizedInput, 'oki2') || in_array($normalizedInput, ['operator', 'operator01']))) {
-            if (in_array($password, ['oki123', 'password123', 'andritz123', '123456', 'oki'])) {
-                $user = User::updateOrCreate(
-                    ['user_id' => 'Andritztk_OKI II'],
-                    [
-                        'name' => 'Andritztk OKI II',
-                        'email' => 'andritztk.oki2@pallet-system.local',
-                        'password' => Hash::make($password),
-                        'role' => 'operator',
-                    ]
-                );
+            // 3. Fallback auto-provisioning for production/server if the user account does not exist in DB yet
+            if (! $user && (str_contains($normalizedInput, 'andritztk') || str_contains($normalizedInput, 'oki2') || in_array($normalizedInput, ['operator', 'operator01']))) {
+                if (in_array($password, ['oki123', 'password123', 'andritz123', '123456', 'oki'])) {
+                    $user = User::updateOrCreate(
+                        ['user_id' => 'Andritztk_OKI II'],
+                        [
+                            'name' => 'Andritztk OKI II',
+                            'email' => 'andritztk.oki2@pallet-system.local',
+                            'password' => Hash::make($password),
+                            'role' => 'operator',
+                        ]
+                    );
+                }
             }
+        } catch (\Throwable $e) {
+            Log::error('Login database connection failure: '.$e->getMessage());
+
+            return back()
+                ->withInput($request->only('user_id'))
+                ->withErrors([
+                    'user_id' => 'Koneksi database gagal (Kode '.$e->getCode().'): '.$e->getMessage().'. Periksa nama database (misal: u168_Material_Dressing) dan hak akses user di cPanel.',
+                ]);
         }
 
         if ($user) {
