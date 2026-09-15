@@ -31,6 +31,7 @@ putenv('APP_SERVICES_CACHE=/tmp/bootstrap/cache/services.php');
 // Ensure critical environment variables are not empty strings
 $defaultEnvs = [
     'SESSION_DRIVER' => 'cookie',
+    'SESSION_SECURE_COOKIE' => 'true',
     'CACHE_STORE' => 'array',
     'APP_TIMEZONE' => 'Asia/Jakarta',
     'APP_ENV' => 'production',

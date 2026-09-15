@@ -111,7 +111,7 @@ class AuthController extends Controller
                     Auth::login($user, $request->boolean('remember'));
                     $request->session()->regenerate();
 
-                    return redirect()->intended(route('pallet.index'))->with(
+                    return redirect()->route('pallet.index')->with(
                         'success',
                         'Login berhasil! Selamat datang di Pallet Material System, '.Auth::user()->name.'.'
                     );
@@ -137,7 +137,7 @@ class AuthController extends Controller
                 if ($matched) {
                     $request->session()->regenerate();
 
-                    return redirect()->intended(route('pallet.index'))->with(
+                    return redirect()->route('pallet.index')->with(
                         'success',
                         'Login berhasil! Selamat datang di Pallet Material System, '.Auth::user()->name.'.'
                     );
