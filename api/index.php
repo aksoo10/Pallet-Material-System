@@ -36,6 +36,12 @@ $defaultEnvs = [
     'APP_ENV' => 'production',
     'APP_MAINTENANCE_DRIVER' => 'file',
     'APP_KEY' => 'base64:lvX3kwemEw1kb+Sa2RHzlxOEgyo5LEP/wod7WKwgZR0=',
+    'DB_CONNECTION' => 'mysql',
+    'DB_HOST' => '38.45.72.91',
+    'DB_PORT' => '3306',
+    'DB_DATABASE' => 'Material_Dressing',
+    'DB_USERNAME' => 'u168_AgufvtiYua',
+    'DB_PASSWORD' => 'f.azi@5P84cVo3erlGfRXCXA',
 ];
 
 foreach ($defaultEnvs as $key => $defaultVal) {
