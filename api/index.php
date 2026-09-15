@@ -40,7 +40,7 @@ $defaultEnvs = [
     'DB_CONNECTION' => 'mysql',
     'DB_HOST' => '38.45.72.91',
     'DB_PORT' => '3306',
-    'DB_DATABASE' => 'Material_Dressing',
+    'DB_DATABASE' => 'material_dressing',
     'DB_USERNAME' => 'u168_AgufvtiYua',
     'DB_PASSWORD' => 'f.azi@5P84cVo3erlGfRXCXA',
 ];
